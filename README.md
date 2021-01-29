@@ -2,6 +2,8 @@
 
 Preview https://twitter.com/BennyKokMusic/status/1355014412990517253
 
+![Imgur](https://i.imgur.com/9979vVW.gif)
+
 Currently support for ProBuilder directly
 
 Require a custom rect mapping for each texture
