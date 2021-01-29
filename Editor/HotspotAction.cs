@@ -73,30 +73,36 @@ namespace BennyKok.HotspotUV.Editor
                 mesh.ToMesh();
                 var faces = mesh.GetSelectedFaces();
                 mesh.GetUVs(0, currentUVs);
-                // Debug.Log(currentUVs.Count);
-
-                // List<int> indices = new List<int>();
-                // GetDistinctIndices(faces, indices);
+                var pos = mesh.positions;
 
                 // var uv = mesh.textures;
                 // Debug.Log(uv.Count);
                 // Debug.Log(currentUVs.Count);
+                // Debug.Log(currentUVs.Aggregate(" ", (x, y) => x + ", " + y));
                 foreach (var face in faces)
                 {
                     System.Collections.ObjectModel.ReadOnlyCollection<int> distinctIndexes = face.distinctIndexes;
+
+                    // PlanarProject the target face with probuidler api 
+                    var position = new List<Vector3>();
+                    for (int i = 0; i < distinctIndexes.Count; i++)
+                        position.Add(pos[distinctIndexes[i]]);
+
+                    var projection = Projection.PlanarProject(position);
+                    // Debug.Log(projection.Aggregate(" ", (x, y) => x + ", " + y));
                     // Debug.Log(distinctIndexes.Aggregate(" ", (x, y) => x + ", " + y));
                     var list = target.GetRandomUV();
-                    int count = 0;
-                    foreach (var index in distinctIndexes)
+
+                    // Fit the projected uv points to the hotspot rect
+                    var fittedUV = FitUVs(projection, list.ToArray());
+
+                    for (int i = 0; i < distinctIndexes.Count; i++)
                     {
-                        currentUVs[index] = list[count];
-                        // Debug.Log(uv[index]); 
-                        // Debug.Log(list[count]);
-                        count++;
+                        int index = distinctIndexes[i];
+                        currentUVs[index] = fittedUV[i];
                     }
                     face.manualUV = true;
                 }
-                // mesh.textures = uv;
                 mesh.SetUVs(0, currentUVs);
                 mesh.Refresh();
                 return new ActionResult(ActionResult.Status.Success, "Hotspot UV");
@@ -104,5 +110,72 @@ namespace BennyKok.HotspotUV.Editor
 
             return new ActionResult(ActionResult.Status.NoChange, "NoChange");
         }
+
+        internal static Vector2 SmallestVector2(Vector2[] v)
+        {
+            int len = v.Length;
+            Vector2 l = v[0];
+            for (int i = 0; i < len; i++)
+            {
+                if (v[i].x < l.x) l.x = v[i].x;
+                if (v[i].y < l.y) l.y = v[i].y;
+            }
+            return l;
+        }
+
+        internal static Vector2 LargestVector2(Vector2[] v)
+        {
+            int len = v.Length;
+            Vector2 l = v[0];
+            for (int i = 0; i < len; i++)
+            {
+                if (v[i].x > l.x) l.x = v[i].x;
+                if (v[i].y > l.y) l.y = v[i].y;
+            }
+            return l;
+        }
+
+        public static Vector2[] FitUVs(Vector2[] uvs, Vector2[] target)
+        {
+            // shift UVs to zeroed coordinates
+            Vector2 smallestVector2 = SmallestVector2(uvs);
+            Vector2 smallestVector2Target = SmallestVector2(target);
+
+            int i;
+            for (i = 0; i < uvs.Length; i++)
+            {
+                uvs[i] -= smallestVector2;
+            }
+
+            smallestVector2 = SmallestVector2(uvs);
+            smallestVector2Target = SmallestVector2(target);
+
+            // Debug.Log(uvs.Aggregate(" ", (x, y) => x + ", " + y));
+
+            Vector2 largetestVector2 = LargestVector2(uvs);
+            Vector2 largestVector2Target = LargestVector2(target);
+            float widthScale = (largetestVector2.x - smallestVector2.x) / (largestVector2Target.x - smallestVector2Target.x);
+            float heightScale = (largetestVector2.y - smallestVector2.y) / (largestVector2Target.y - smallestVector2Target.y);
+            float scale = Mathf.Max(widthScale, heightScale);
+
+            // Debug.Log(scale);
+            // Debug.Log(uvs.Aggregate("Before UVS ", (x, y) => x + ", " + y));
+
+            for (i = 0; i < uvs.Length; i++)
+            {
+                uvs[i] /= scale;
+            }
+
+            for (i = 0; i < uvs.Length; i++)
+            {
+                uvs[i] += target[3];
+            }
+            // Debug.Log(target.Aggregate("Target ", (x, y) => x + ", " + y));
+            // Debug.Log(uvs.Aggregate("UVS ", (x, y) => x + ", " + y));
+            // Debug.Log(target[3]);
+
+            return uvs;
+        }
     }
+
 }

@@ -11,6 +11,7 @@ namespace BennyKok.HotspotUV
 
         public Rect GetRandomRect()
         {
+            // return rects[0];
             return rects[Random.Range(0, rects.Count)];
         }
 
@@ -21,8 +22,8 @@ namespace BennyKok.HotspotUV
             var rect = GetRandomRect();
 
             // Transforming from texture space to UV space
-            list.Add(rect.TopRight() / size);
             list.Add(rect.TopLeft() / size);
+            list.Add(rect.TopRight() / size);
             list.Add(rect.BottomRight() / size);
             list.Add(rect.BottomLeft() / size);
 
