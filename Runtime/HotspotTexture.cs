@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BennyKok.HotspotUV
 {
-    [CreateAssetMenu(fileName = "HotspotTexture", menuName = "HotspotUV/HotspotTexture", order = 0)]
+    [CreateAssetMenu(fileName = "New Hotspot Texture", menuName = "Hotspot UV/Hotspot Texture", order = 300)]
     public class HotspotTexture : ScriptableObject
     {
         public Texture target;
