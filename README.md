@@ -6,6 +6,7 @@ Preview https://twitter.com/BennyKokMusic/status/1355014412990517253
 
 # Setup steps
 
+0. UPM -> Install via Git Url -> https://github.com/BennyKok/unity-hotspot-uv.git
 1. Create a *HotspotTexture* for each texture you want to use!
 2. Dobule click to open the *RectCreator*
 3. Draw out the rect (undo, grid snapping, pan & zoom)
