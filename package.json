@@ -1,7 +1,7 @@
 {
     "name": "com.bennykok.unity-hotspot-uv",
     "displayName": "Hotspot UV",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Simple hotspot uv for Unity for ProBuilder",
     "unity": "2019.4",
     "dependencies": {
