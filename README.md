@@ -25,8 +25,8 @@ You can learn more about it here!
 https://github.com/leukbaars/DreamUV#hotspotting
 
 ## Explore
-Feel free to check out some of my free assets and site.
+Feel free to check me out!! :)
 
-- [AssetStore](https://assetstore.unity.com/publishers/28510)
-- [Website](https://bennykok.com)
 - [Twitter](https://twitter.com/BennyKokMusic)
+- [Website](https://bennykok.com)
+- [AssetStore](https://assetstore.unity.com/publishers/28510)
