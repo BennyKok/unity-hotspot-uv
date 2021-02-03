@@ -51,11 +51,116 @@ namespace BennyKok.HotspotUV.Editor
                 SessionState.SetInt("hostpot-uv-target-id", target.GetInstanceID());
             }
 
+            EditorGUILayout.Space();
+
+            GUILayout.Label("Rotate", EditorStyles.boldLabel);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("-45"))
+                    RotateUV(-45);
+                if (GUILayout.Button("+45"))
+                    RotateUV(45);
+            }
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("-90"))
+                    RotateUV(-90);
+                if (GUILayout.Button("+90"))
+                    RotateUV(90);
+            }
+
+            GUILayout.Label("Flip", EditorStyles.boldLabel);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("X"))
+                    FlipUV(Vector2.right);
+                if (GUILayout.Button("Y"))
+                    FlipUV(Vector2.up);
+            }
+
             GUILayout.FlexibleSpace();
 
             if (GUILayout.Button("Hotspot selection"))
                 DoAction();
         }
+
+        public void RotateUV(float rotation)
+        {
+            var currentUVs = new List<Vector4>();
+            foreach (var mesh in MeshSelection.top)
+            {
+                Undo.RecordObject(mesh, "Rotate UV");
+                mesh.ToMesh();
+                var faces = mesh.GetSelectedFaces();
+                var pos = mesh.positions;
+                mesh.GetUVs(0, currentUVs);
+
+                foreach (var face in faces)
+                {
+                    var distinctIndexes = face.distinctIndexes;
+
+                    var uvs = new List<Vector2>();
+                    for (int i = 0; i < distinctIndexes.Count; i++)
+                        uvs.Add(currentUVs[distinctIndexes[i]]);
+
+                    var center = UnityEngine.ProBuilder.Math.Average(uvs);
+
+                    for (int i = 0; i < distinctIndexes.Count; i++)
+                    {
+                        int index = distinctIndexes[i];
+                        currentUVs[index] = RotatePointAroundPivot(currentUVs[index], center, new Vector3(0, 0, -rotation));
+                    }
+                    face.manualUV = true;
+                }
+
+                mesh.SetUVs(0, currentUVs);
+                mesh.Refresh();
+                mesh.Optimize();
+            }
+        }
+
+        public Vector2 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+        {
+            return Quaternion.Euler(angles) * (point - pivot) + pivot;
+        }
+
+        public void FlipUV(Vector2 direction)
+        {
+            var currentUVs = new List<Vector4>();
+            foreach (var mesh in MeshSelection.top)
+            {
+                Undo.RecordObject(mesh, "Flip UV");
+                mesh.ToMesh();
+                var faces = mesh.GetSelectedFaces();
+                var pos = mesh.positions;
+                mesh.GetUVs(0, currentUVs);
+
+                foreach (var face in faces)
+                {
+                    var distinctIndexes = face.distinctIndexes;
+
+                    var uvs = new List<Vector2>();
+                    for (int i = 0; i < distinctIndexes.Count; i++)
+                        uvs.Add(currentUVs[distinctIndexes[i]]);
+
+                    var center = UnityEngine.ProBuilder.Math.Average(uvs);
+
+                    for (int i = 0; i < distinctIndexes.Count; i++)
+                    {
+                        int index = distinctIndexes[i];
+                        currentUVs[index] = UnityEngine.ProBuilder.Math.ReflectPoint(currentUVs[index], center, center + direction);
+                    }
+                    face.manualUV = true;
+                }
+
+                mesh.SetUVs(0, currentUVs);
+                mesh.Refresh();
+                mesh.Optimize();
+            }
+        }
+
 
         public override ActionResult DoAction()
         {
@@ -81,7 +186,7 @@ namespace BennyKok.HotspotUV.Editor
                 // Debug.Log(currentUVs.Aggregate(" ", (x, y) => x + ", " + y));
                 foreach (var face in faces)
                 {
-                    System.Collections.ObjectModel.ReadOnlyCollection<int> distinctIndexes = face.distinctIndexes;
+                    var distinctIndexes = face.distinctIndexes;
 
                     // PlanarProject the target face with probuidler api 
                     var position = new List<Vector3>();
