@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/BennyKok/HotspotUV/compare/v1.1.0...v1.1.1) (2021-05-17)
+
+
+### Bug Fixes
+
+* support for probuilder 5.0.3 ([d69a4db](https://github.com/BennyKok/HotspotUV/commit/d69a4dbd681cf921943cb9183a67a5162c0ce912))
+
 ## 1.1.0 (2021-02-03)
 
 
