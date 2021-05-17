@@ -83,7 +83,7 @@ namespace BennyKok.HotspotUV.Editor
             GUILayout.FlexibleSpace();
 
             if (GUILayout.Button("Hotspot selection"))
-                DoAction();
+                PerformAction();
         }
 
         public void RotateUV(float rotation)
@@ -162,7 +162,13 @@ namespace BennyKok.HotspotUV.Editor
         }
 
 
-        public override ActionResult DoAction()
+#if HAS_PROBUILDER_5
+        protected override ActionResult PerformActionImplementation() => RunAction();
+#else
+        public override ActionResult DoAction() => RunAction();
+#endif
+
+        public ActionResult RunAction()
         {
             CheckForSettings();
 
